@@ -27,6 +27,13 @@ const reducer = (state, action) => {
                 currentUserInfo: action.currentUserInfo
             }
         }
+        case 'store-home-feed-info' : {
+            return {
+                ...state,
+                homeFeedInfo: action.homeFeedInfo
+
+            }
+        }
         default:
             throw new Error('ERROR ERROR ERROR ERROR')
     }
@@ -41,6 +48,8 @@ export const CurrentUserProvider = ({children}) => {
           .then((res)=>res.json())
           .then((data)=>{
             dispatch({type: 'store-profile-info', currentUserInfo: data.profile})
+            dispatch({type:'data-received'})
+            dispatch({type: 'set-current-user', currentUser: data.profile.handle})
           })
       }, [])
     
