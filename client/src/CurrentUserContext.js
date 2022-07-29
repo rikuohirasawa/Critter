@@ -5,7 +5,9 @@ export const CurrentUserContext = createContext(null);
 const initialState = {
     currentUser: null,
     status: 'loading',
-    currentUserInfo: null
+    currentUserInfo: null,
+    homeFeedInfo: null,
+    tweetInfo: null
 };
 
 const reducer = (state, action) => {
@@ -31,7 +33,6 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 homeFeedInfo: action.homeFeedInfo
-
             }
         }
         default:

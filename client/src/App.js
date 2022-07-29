@@ -18,7 +18,7 @@ import {COLORS} from './constants';
 
 const App = () => {
   const {currentUser, dispatch, currentUserInfo} = useContext(CurrentUserContext)
-  console.log(useContext(CurrentUserContext))
+  // console.log(useContext(CurrentUserContext))
 
 
   if (!currentUserInfo) {
