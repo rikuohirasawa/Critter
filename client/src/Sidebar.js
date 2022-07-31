@@ -16,7 +16,7 @@ export const Sidebar = () => {
                     <FiHome/>
                     Home
                 </StyleNavLink>
-                <StyleNavLink to='/:profileId'>
+                <StyleNavLink to='/treasurymog'>
                     <FiUser/>
                     Profile
                 </StyleNavLink>

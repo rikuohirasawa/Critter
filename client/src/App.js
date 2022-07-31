@@ -23,14 +23,15 @@ const App = () => {
 
   if (!currentUserInfo) {
     return (
+      <>
       <FlexLoadingScreen>
         <LoadingScreenCat/>
       </FlexLoadingScreen>
+      </>
     )
   } else {
   return (
     <>
-
       <GlobalStyles/>
       <BrowserRouter>
         <FlexWrapper>
@@ -55,7 +56,7 @@ const FlexWrapper = styled.div`
 display: flex;
 `
 
-const FlexLoadingScreen = styled.div`
+export const FlexLoadingScreen = styled.div`
 width: 100vw;
 height: 100vh;
 display: flex;
@@ -63,7 +64,7 @@ justify-content: center;
 align-items: center;
 `
 
-const LoadingScreenCat = styled(IoLogoOctocat)`
+export const LoadingScreenCat = styled(IoLogoOctocat)`
 height: 120px;
 width: 100%;
 color: ${COLORS.primary}

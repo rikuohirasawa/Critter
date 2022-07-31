@@ -1,23 +1,32 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TweetContext } from "./TweetContext";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import {GoLocation} from "react-icons/go"
 import { AiOutlineCalendar } from "react-icons/ai";
-import { Avatar } from "./HomeFeed";
 import {COLORS} from './constants';
+import { DisplayTweets, Avatar } from "./DisplayTweets";
+import { ErrorScreen } from "./ErrorScreen";
 
 
 export const Profile = () => {
   const {profileInfo, dispatchTweet, userFeed} = useContext(TweetContext);
+  const [profileFeedError, setProfileFeedError] = useState(null)
   
   const {profileId} = useParams();
   
   useEffect(()=>{
     fetch(`api/${profileId}/profile`)
-    .then((res)=>res.json())
+    .then((res=>{
+      if (!res.ok) {
+        throw Error('An unknown error has occured.')
+      }
+      return res.json()}))
     .then((data)=>{
+      setProfileFeedError(null)
       dispatchTweet({type: 'store-profile-info', profileInfo: data})
+    }).catch(err=>{
+      setProfileFeedError(err.message)
     })
   }, [])
 
@@ -25,9 +34,11 @@ export const Profile = () => {
     fetch(`api/${profileId}/feed`)
     .then((res)=>res.json())
     .then((data)=>{
+      console.log(data)
       dispatchTweet({type: 'store-user-feed', userFeed: data})
     })
   }, [])
+
 
   
   if (profileInfo) {
@@ -35,37 +46,48 @@ export const Profile = () => {
   const banner = profile.bannerSrc;
 
     return (
+
       <Container>
-        <Banner banner={banner}></Banner>
-        <FlexColumn>
-          <JustifyBetween>
-            <AvatarStyle src={profile.avatarSrc}></AvatarStyle>
-            <FollowButton>Following</FollowButton>
-          </JustifyBetween>
-          <DisplayName>{profile.displayName}</DisplayName>
-          <Handle>
-            @{profile.handle} {profile.isFollowingYou && <FollowsYou>Follows you</FollowsYou>}
-          </Handle>
-          <div>{profile.bio}</div>
-          <FlexGap>
-            <Handle><GoLocation/> {profile.location}</Handle>
-            <Handle><AiOutlineCalendar/> Joined: {profile.joined}</Handle>
-          </FlexGap>
-          <FlexGap>
-            <div>
-            <BoldText>{profile.numFollowing}</BoldText> Following
-            </div>
-            <div> 
-            <BoldText>{profile.numFollowers}</BoldText> Followers
-            </div>      
-          </FlexGap>
-        </FlexColumn>
-        <JustifySpaceAround>
-          <div><BoldText>Tweets</BoldText></div>
-          <div><BoldText>Media</BoldText></div>
-          <div><BoldText>Likes</BoldText></div>
-        </JustifySpaceAround>
-     
+        {profileFeedError ?
+        <ErrorScreen/>
+      :
+      <>
+      <Banner banner={banner}></Banner>
+      <FlexColumn>
+        <JustifyBetween>
+          <AvatarStyle src={profile.avatarSrc}></AvatarStyle>
+          <FollowButton>Following</FollowButton>
+        </JustifyBetween>
+        <DisplayName>{profile.displayName}</DisplayName>
+        <Handle>
+          @{profile.handle} {profile.isFollowingYou && <FollowsYou>Follows you</FollowsYou>}
+        </Handle>
+        <div>{profile.bio}</div>
+        <FlexGap>
+          <Handle><GoLocation/> {profile.location}</Handle>
+          <Handle><AiOutlineCalendar/> Joined: {profile.joined}</Handle>
+        </FlexGap>
+        <FlexGap>
+          <div>
+          <BoldText>{profile.numFollowing}</BoldText> Following
+          </div>
+          <div> 
+          <BoldText>{profile.numFollowers}</BoldText> Followers
+          </div>      
+        </FlexGap>
+      </FlexColumn>
+      <JustifySpaceAround>
+        <div><BoldText>Tweets</BoldText></div>
+        <div><BoldText>Media</BoldText></div>
+        <div><BoldText>Likes</BoldText></div>
+      </JustifySpaceAround> 
+      {
+      userFeed && 
+      <DisplayTweets data={userFeed}/>
+      }
+      </>
+      }
+       
       </Container>
     )
   }
@@ -121,6 +143,13 @@ export const Profile = () => {
   const DisplayName = styled.div`
   font-weight: 700;
   font-size: 1.5rem;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+    cursor: pointer;
+    z-index: 99;
+  }
   `
 
   const FollowsYou = styled.span`

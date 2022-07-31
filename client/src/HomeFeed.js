@@ -1,93 +1,194 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { CurrentUserContext } from './CurrentUserContext';
 import { TweetContext } from "./TweetContext";
 import styled from "styled-components";
+import {COLORS} from './constants';
 
 import { BsChat } from "react-icons/bs";
 import {AiOutlineRetweet, AiOutlineHeart} from "react-icons/ai"
 import {FiUpload} from "react-icons/fi"
 import { useHistory } from "react-router-dom";
+import { DisplayTweets } from "./DisplayTweets";
+
+import {LoadingScreen} from "./LoadingScreen";
+import { ErrorScreen } from "./ErrorScreen";
+
+
 
 export const HomeFeed = () => {
-  const {dispatch, homeFeedInfo, tweetInfo} = useContext(CurrentUserContext);
+  const {dispatch, homeFeedInfo, currentUserInfo} = useContext(CurrentUserContext);
   const {dispatchTweet, profileInfo} = useContext(TweetContext);
   const history = useHistory();
+  const [characters, setCharacters] = useState(280);
+  const [newUserTweet, setNewUserTweet] = useState(null);
+  const [homeFeedError, setHomeFeedError] = useState(null);
+  const [postError, setPostError] = useState(null);
   
   useEffect(()=>{
     fetch('/api/me/home-feed')
-    .then((res)=>res.json())
+    .then((res=>{
+      if(!res.ok) {
+        throw Error('An unknown error has occured.')
+      }
+      return res.json()}))
     .then((data)=>{
-      dispatch({type: 'store-home-feed-info', homeFeedInfo: data.tweetsById})
+      setHomeFeedError(null)
+      dispatch({type: 'store-home-feed-info', homeFeedInfo: data})
+    }).catch(err=>{
+      setHomeFeedError(err.message)
     })
   }, [])
-  
-  if (homeFeedInfo) {
-    //create new array of tweets sorted by date in descending order
-    const tweetsByDate = (Object.values(homeFeedInfo).sort((a, b) =>{
-      return new Date(`${a.timestamp}`) - new Date(`${b.timestamp}`)
-    }));
-    tweetsByDate.reverse();
 
-    return (
-      <FlexColumn>
-      {tweetsByDate.map(element=>{
-        const author = element.author;
-        const tweetDay = new Date(`${element.timestamp}`).getDate();
-        const tweetMonth = new Date(`${element.timestamp}`).getMonth();
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept',
-      'Oct', 'Nov', 'Dec']
-      
-      const handleClickTweet = () => {
-        history.push(`/tweet/${element.id}`)
-        // fetch(`/api/tweet/${element.id}`)
-        // .then((res)=>res.json())
-        // .then((data)=>{
-        //   dispatchTweet({type: 'store-tweet-details' , tweetInfo: data})
-        // })
+  const postStatus = (e) => {
+    if (characters >= 0) {
+      e.preventDefault();
+      e.target.reset();
+      fetch('api/tweet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 'status': newUserTweet })
+    }).then((res=>{
+      if(!res.ok) {
+        throw Error('Post error')
       }
-      console.log(author.handle)
+      return res.json()}))
+    .then((data)=>{
+      setPostError(null)
+      console.log(data)
+    }).catch(err=>{
+      setPostError(err.message)
+    })
+    fetch('/api/me/home-feed')
+    .then((res)=>res.json())
+    .then((data)=>{
+      dispatch({type: 'store-home-feed-info', homeFeedInfo: data})
+    })
+    setCharacters(280)
+    } else {
+      e.preventDefault();
+      window.alert('Too many characters, please shorten your tweet to post')
+    }
+  }
 
-      const handleClickProfile = () => {
-        history.push(`${author.handle}`)
-        // fetch(`api/${author.handle}/profile`)
-        // .then((res)=>res.json())
-        // .then((data)=>{
-        //   dispatchTweet({type: 'store-profile-info', profileInfo: data})
-        // })
+  const textAreaLengthFx = (event) => {
+    {
+     setCharacters(280 - event.target.value.length)
+     setNewUserTweet(event.target.value)
+     console.log(newUserTweet)
+   }
+ }
+
+if (currentUserInfo) {
+  return (
+    <>
+    <FlexColumn>
+    <div>Home</div>
+        <Form onSubmit={(event)=>{postStatus(event)}}>
+        <FlexGap>
+        <Avatar src={currentUserInfo.avatarSrc}/>
+        <Status placeholder="What's happening?" maxlength="280" onInput={(event)=>{textAreaLengthFx(event)}}/>
+        </FlexGap>
+        <FlexContainer>
+          {
+          characters < 56  && characters > 0 ?
+          <span style={{color: 'rgba(194, 196, 0, 1)'}}>{characters}</span>
+          : characters < 0 ?
+          <span style={{color: 'red'}}>{characters}</span>
+          :
+          <span>{characters}</span>
       }
-        return (
-          <Tweet 
-          onClick={()=>{handleClickTweet()}}
-          >
-            <FlexWrapper>
-            <Avatar src={author.avatarSrc}/>
-            <FlexColGap>
-              <div>
-                <DisplayName onClick={(event)=>{
-                  event.stopPropagation()
-                  handleClickProfile()}}>{author.displayName}</DisplayName> <AccentText>@{author.handle} {months[tweetMonth]}-{tweetDay}</AccentText>
-              </div>
-              <div>{element.status}</div>
-              {
-              element.media[0] &&
-              <Image src={element.media[0].url}></Image>
-              } 
-              <IconWrapper><BsChat/><AiOutlineRetweet/><AiOutlineHeart/><FiUpload/></IconWrapper>
-            </FlexColGap>
-            </FlexWrapper>
-          </Tweet>
-        )
-      })}
-      </FlexColumn>
-    )
+          <TweetButton type='submit'>Meow</TweetButton>
+          </FlexContainer>
+        </Form>
+        {homeFeedError ?
+        <ErrorScreen/>
+        :
+        postError ?
+        <>
+        <ErrorScreen/>
+        <DisplayTweets data={homeFeedInfo}/>
+        </>
+        :
+        <DisplayTweets data={homeFeedInfo}/>
+
+        }
+    </FlexColumn>
+    </>
+  )
+  }
 }
-}
+
+
 
 export const FlexColumn = styled.div`
 display: flex;
 flex-direction: column;
 width: 800px;
 align-items: center;
+border-left: 1px solid rgba(193, 193, 193, 0.51);
+border-right: 1px solid rgba(193, 193, 193, 0.51);
+`
+
+const FlexGap = styled.div`
+display: flex;
+justify-content: flex-start;
+width: 100%;
+gap: 1rem;
+`
+
+const FlexContainer = styled.div`
+display: flex;
+align-items: center;
+gap: 1rem;
+`
+
+const Form = styled.form`
+display: flex;
+flex-direction: column;
+width: 95%;
+align-items: flex-end;
+gap: 8px;
+padding: 1.5rem 0;
+border-bottom: 4px solid rgba(193, 193, 193, 0.3);
+`
+
+
+const Status = styled.textarea`
+resize: none;
+height: 250px;
+width: 70%;
+border: none;
+padding: 1.5rem;
+font-size: 1.5rem;
+border-bottom: 1px solid white;
+border-top: 1px solid white;
+
+&:focus {
+  border-bottom: 1px solid rgba(193, 193, 193, 0.3);
+  border-top: 1px solid rgba(193, 193, 193, 0.3);
+  outline: none;
+}
+`
+
+const TweetButton = styled.button`
+  background: ${COLORS.primary};
+  color: #fff;
+  border: none;
+  height: 100%;
+  padding: 1rem 1.5rem;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 2px solid #fff;
+
+  &:hover {
+  background: #fff;
+  color: ${COLORS.primary};
+  border: 2px solid ${COLORS.primary}
+  }
 `
 
 const Tweet = styled.div`
@@ -111,8 +212,8 @@ width: 100%;
 
 export const Avatar = styled.img`
 border-radius: 50%;
-width: 40px;
-height: 100%;
+height: 60px;
+
 `
 
 export const DisplayName = styled.span`

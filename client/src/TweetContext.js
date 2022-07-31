@@ -5,7 +5,7 @@ export const TweetContext = createContext(null);
 const initialTweetState = {
     profileInfo: null,
     tweetInfo: null,
-    userFeed: null
+    userFeed: null,
 }
 
 const reducer = (state, action) => {

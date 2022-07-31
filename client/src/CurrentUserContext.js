@@ -7,7 +7,9 @@ const initialState = {
     status: 'loading',
     currentUserInfo: null,
     homeFeedInfo: null,
-    tweetInfo: null
+    tweetInfo: null,
+    userLiked: {},
+    userRetweeted: {}
 };
 
 const reducer = (state, action) => {
@@ -33,6 +35,24 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 homeFeedInfo: action.homeFeedInfo
+            }
+        }
+        case 'store-user-liked' : {
+            return {
+                ...state,
+                userLiked: {
+                    ...state.userLiked,
+                    [action.key] : action.liked 
+                }
+            }
+        }
+        case 'store-user-retweeted': {
+            return {
+                ...state,
+                userRetweeted: {
+                    ...state.userRetweeted,
+                    [action.key] : action.retweeted
+                }
             }
         }
         default:
