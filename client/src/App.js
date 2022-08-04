@@ -14,22 +14,20 @@ import { CurrentUserContext } from './CurrentUserContext';
 
 import {IoLogoOctocat} from 'react-icons/io';
 import {COLORS} from './constants';
+import { ErrorScreen } from './ErrorScreen';
 
 
 const App = () => {
-  const {currentUser, dispatch, currentUserInfo} = useContext(CurrentUserContext)
+  const {currentUser, dispatch, currentUserInfo, status, error} = useContext(CurrentUserContext)
   // console.log(useContext(CurrentUserContext))
+  console.log(status)
 
 
-  if (!currentUserInfo) {
-    return (
-      <>
-      <FlexLoadingScreen>
-        <LoadingScreenCat/>
-      </FlexLoadingScreen>
-      </>
-    )
-  } else {
+  // if (!currentUserInfo) {
+  //   return (
+
+  //   )
+  // } else {
   return (
     <>
       <GlobalStyles/>
@@ -37,19 +35,29 @@ const App = () => {
         <FlexWrapper>
           {/* <button onClick={()=>{dispatch({type: 'set-current-user', currentUser: 'rikuo'})}}>{currentUserInfo.handle}</button> */}
           <Sidebar/>
+          {error ?
+          <ErrorScreen/>
+          : !currentUserInfo ?
+          <>
+          <FlexLoadingScreen>
+            <LoadingScreenCat/>
+          </FlexLoadingScreen>
+          </>
+          :
           <Switch>
-            <Route exact path='/'><HomeFeed/></Route>
-            <Route exact path='/notifications'><Notifications/></Route>
-            <Route exact path='/bookmarks'><Bookmarks/></Route>
-            <Route exact path='/tweet/:tweetId'><TweetDetails/></Route>
-            <Route exact path='/:profileId'><Profile/></Route>
-          </Switch>
+          <Route exact path='/'><HomeFeed/></Route>
+          <Route exact path='/notifications'><Notifications/></Route>
+          <Route exact path='/bookmarks'><Bookmarks/></Route>
+          <Route exact path='/tweet/:tweetId'><TweetDetails/></Route>
+          <Route exact path='/:profileId'><Profile/></Route>
+        </Switch>
+          }
         </FlexWrapper>
       </BrowserRouter>
     </>
   )
 }
-}
+// }
 export default App;
 
 const FlexWrapper = styled.div`

@@ -16,12 +16,12 @@ import { ErrorScreen } from "./ErrorScreen";
 
 
 export const HomeFeed = () => {
-  const {dispatch, homeFeedInfo, currentUserInfo} = useContext(CurrentUserContext);
+  const {dispatch, homeFeedInfo, currentUserInfo, error} = useContext(CurrentUserContext);
   const {dispatchTweet, profileInfo} = useContext(TweetContext);
   const history = useHistory();
   const [characters, setCharacters] = useState(280);
   const [newUserTweet, setNewUserTweet] = useState(null);
-  const [homeFeedError, setHomeFeedError] = useState(null);
+  // const [homeFeedError, setHomeFeedError] = useState(null);
   const [postError, setPostError] = useState(null);
   
   useEffect(()=>{
@@ -32,10 +32,10 @@ export const HomeFeed = () => {
       }
       return res.json()}))
     .then((data)=>{
-      setHomeFeedError(null)
+      dispatch({type: 'restore-error', error: null})
       dispatch({type: 'store-home-feed-info', homeFeedInfo: data})
     }).catch(err=>{
-      setHomeFeedError(err.message)
+      dispatch({type: 'store-error', error: err.message})
     })
   }, [])
 
@@ -102,9 +102,7 @@ if (currentUserInfo) {
           <TweetButton type='submit'>Meow</TweetButton>
           </FlexContainer>
         </Form>
-        {homeFeedError ?
-        <ErrorScreen/>
-        :
+        {
         postError ?
         <>
         <ErrorScreen/>

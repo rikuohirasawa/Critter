@@ -114,7 +114,6 @@ export const TweetDetails = () => {
     />
   </Content>
   }
- 
     </StyleColumn>
   )
   }

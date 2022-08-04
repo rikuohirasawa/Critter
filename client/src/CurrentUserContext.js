@@ -9,7 +9,8 @@ const initialState = {
     homeFeedInfo: null,
     tweetInfo: null,
     userLiked: {},
-    userRetweeted: {}
+    userRetweeted: {},
+    error: null
 };
 
 const reducer = (state, action) => {
@@ -53,6 +54,18 @@ const reducer = (state, action) => {
                     ...state.userRetweeted,
                     [action.key] : action.retweeted
                 }
+            }
+        }
+        case 'store-error' : {
+            return {
+                ...state, 
+                error: action.error
+            }
+        }
+        case 'restore-error' : {
+            return {
+                ...state,
+                error: action.error
             }
         }
         default:
