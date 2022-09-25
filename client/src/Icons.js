@@ -8,30 +8,34 @@ import { useContext } from "react";
 export const Icons = ({data, id}) => {
     const {dispatch, userLiked} = useContext(CurrentUserContext);
     const handleClickLike = () => {
+        // if not already liked - change liked to true and store in reducer
+        // data is passed down to icons - which contains individual tweet information - i am
+        // changing the isLiked property to true
         if (data.isLiked === false) {
         dispatch({type: 'store-user-liked', key: id, liked: true})
         data.isLiked = true;
         data.numLikes += 1;
-        console.log(data.numLikes)
-        // console.log(isLiked)
-
         }
+        // else if already liked - changed liked to false 
         else if (data.isLiked === true) {
         dispatch({type: 'store-user-liked', key: id, liked: false})
         data.isLiked = false;
         data.numLikes -=1
-        // console.log(numLikes)
         }
     }
     const handleClickRetweet = () => {
+        // if not already retweeted - change retweeted to true and store in reducer
+        // data is passed down to icons - which contains individual tweet information - i am
+        // changing the isRetweeted property to true
         if (data.isRetweeted === false) {
             dispatch({type: 'store-user-retweeted', key: id, retweeted: true})
             data.isRetweeted = true;
             data.numRetweets += 1
             if (data.numLikes > 0 ) {
-                // console.log(numLikes)
             }
-        } else if (data.isRetweeted === true) {
+        }
+        // else if already retweeted - change retweeted to false 
+        else if (data.isRetweeted === true) {
             dispatch({type: 'store-user-retweeted', key: id, retweeted: false})
             data.isRetweeted = false;
             data.numRetweets -= 1;
@@ -42,7 +46,6 @@ export const Icons = ({data, id}) => {
    { return (
         <IconWrapper>
             <BsChat/>
-
             <FlexIcon>
                 <IconButton type='retweet'>
                 <RetweetIcon onClick={(event)=>{

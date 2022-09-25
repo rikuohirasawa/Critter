@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { BsChat } from "react-icons/bs";
 import {AiOutlineRetweet, AiOutlineHeart} from "react-icons/ai"
 import {FiUpload} from "react-icons/fi"
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import { CurrentUserContext } from './CurrentUserContext';
 import {LoadingScreen} from "./LoadingScreen";
 
@@ -11,8 +11,7 @@ import {LoadingScreen} from "./LoadingScreen";
 export const DisplayTweets = ({data}) => {
     const history = useHistory();
     const {dispatch, userLiked} = useContext(CurrentUserContext);
-    const [numLikes, setNumLikes] = useState(null)
-    const [liked, setLiked] = useState(null)
+    // if data not yet loaded - render loading screen
     if (!data) {
         return <LoadingScreen/>
     }
@@ -32,8 +31,6 @@ export const DisplayTweets = ({data}) => {
             const handleClickProfile = () => {
                 history.push(`${author.handle}`)
             }
-
-                // dispatch({type: 'store-user-liked', userLiked: objAccess.isLiked})
             const handleClickLike = () => {
                 if (objAccess.isLiked === false) {
                 dispatch({type: 'store-user-liked', key: element, liked: true})

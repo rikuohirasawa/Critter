@@ -19,23 +19,15 @@ import { ErrorScreen } from './ErrorScreen';
 
 const App = () => {
   const {currentUser, dispatch, currentUserInfo, status, error} = useContext(CurrentUserContext)
-  // console.log(useContext(CurrentUserContext))
-  console.log(status)
 
-
-  // if (!currentUserInfo) {
-  //   return (
-
-  //   )
-  // } else {
   return (
     <>
       <GlobalStyles/>
       <BrowserRouter>
         <FlexWrapper>
-          {/* <button onClick={()=>{dispatch({type: 'set-current-user', currentUser: 'rikuo'})}}>{currentUserInfo.handle}</button> */}
           <Sidebar/>
           {error ?
+          // if error - render error screen - else if state has not yet updated - render load screen - else render content
           <ErrorScreen/>
           : !currentUserInfo ?
           <>
@@ -57,7 +49,6 @@ const App = () => {
     </>
   )
 }
-// }
 export default App;
 
 const FlexWrapper = styled.div`

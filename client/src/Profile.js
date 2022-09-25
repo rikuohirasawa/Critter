@@ -11,10 +11,10 @@ import { ErrorScreen } from "./ErrorScreen";
 
 export const Profile = () => {
   const {profileInfo, dispatchTweet, userFeed} = useContext(TweetContext);
-  const [profileFeedError, setProfileFeedError] = useState(null)
-  
+  const [profileFeedError, setProfileFeedError] = useState(null);
   const {profileId} = useParams();
   
+  // fetch user profile information
   useEffect(()=>{
     fetch(`api/${profileId}/profile`)
     .then((res=>{
@@ -30,11 +30,11 @@ export const Profile = () => {
     })
   }, [])
 
+  // fetch user feed
   useEffect(()=>{
     fetch(`api/${profileId}/feed`)
     .then((res)=>res.json())
     .then((data)=>{
-      console.log(data)
       dispatchTweet({type: 'store-user-feed', userFeed: data})
     })
   }, [])
@@ -46,12 +46,12 @@ export const Profile = () => {
   const banner = profile.bannerSrc;
 
     return (
-
       <Container>
         {profileFeedError ?
         <ErrorScreen/>
       :
       <>
+      {/* pass banner down to styled component as a prop */}
       <Banner banner={banner}></Banner>
       <FlexColumn>
         <JustifyBetween>

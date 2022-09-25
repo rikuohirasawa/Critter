@@ -4,13 +4,9 @@ import { TweetContext } from "./TweetContext";
 import styled from "styled-components";
 import {COLORS} from './constants';
 
-import { BsChat } from "react-icons/bs";
-import {AiOutlineRetweet, AiOutlineHeart} from "react-icons/ai"
-import {FiUpload} from "react-icons/fi"
 import { useHistory } from "react-router-dom";
 import { DisplayTweets } from "./DisplayTweets";
 
-import {LoadingScreen} from "./LoadingScreen";
 import { ErrorScreen } from "./ErrorScreen";
 
 
@@ -21,9 +17,9 @@ export const HomeFeed = () => {
   const history = useHistory();
   const [characters, setCharacters] = useState(280);
   const [newUserTweet, setNewUserTweet] = useState(null);
-  // const [homeFeedError, setHomeFeedError] = useState(null);
   const [postError, setPostError] = useState(null);
   
+  // fetch home feed info
   useEffect(()=>{
     fetch('/api/me/home-feed')
     .then((res=>{
@@ -38,7 +34,7 @@ export const HomeFeed = () => {
       dispatch({type: 'store-error', error: err.message})
     })
   }, [])
-
+  // post status - no database so status is not preserved anywhere as of yet
   const postStatus = (e) => {
     if (characters >= 0) {
       e.preventDefault();
@@ -72,11 +68,12 @@ export const HomeFeed = () => {
     }
   }
 
+  // set state to reflect how many characters are left
+  // set second state to the value
   const textAreaLengthFx = (event) => {
     {
      setCharacters(280 - event.target.value.length)
      setNewUserTweet(event.target.value)
-     console.log(newUserTweet)
    }
  }
 
@@ -125,7 +122,6 @@ display: flex;
 flex-direction: column;
 width: 800px;
 align-items: center;
-border-left: 1px solid rgba(193, 193, 193, 0.51);
 border-right: 1px solid rgba(193, 193, 193, 0.51);
 `
 

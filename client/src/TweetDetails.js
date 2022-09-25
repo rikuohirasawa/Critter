@@ -23,6 +23,7 @@ export const TweetDetails = () => {
   useEffect(()=>{
     fetch(`/api/tweet/${tweetId}`)
     .then((res=>{
+      // is res fails throw error
       if (!res.ok) {
         throw Error('An unknown error has occured.')
       }
@@ -32,6 +33,7 @@ export const TweetDetails = () => {
       setTweetDetailsError(null)
       dispatchTweet({type: 'store-tweet-details' , tweetInfo: data})
     }).catch(err=>{
+      // set state to error
       setTweetDetailsError(err.message)
     })
   }, [])
@@ -40,14 +42,15 @@ export const TweetDetails = () => {
   if (tweetInfo) {
   const tweet = tweetInfo.tweet
   const author = tweet.author
+  console.log(tweet)
 
   const handleClickProfile = () => {
     history.replace(`/${author.handle}`)
 }
 
 
-  // Please note that the hours/minutes are ahead by 1.5hrs, apparently due to my timezone, 
-  // there is a fix that I may try to implement later but for now I am leaving it as 
+  // Please note that the hours/minutes are Newfoundland time,
+  // there is a solution that I may try to implement later but for now I am leaving it as 
   // is - you can read more here if interested:
   // https://stackoverflow.com/questions/21134980/why-does-dategethours-return-hour-1
   // https://stackoverflow.com/questions/32469269/javascript-date-give-wrong-date-off-by-one-hour
@@ -63,6 +66,7 @@ export const TweetDetails = () => {
   return (
     <StyleColumn>
     <Header><MdOutlineArrowBack/> Meow</Header>
+    {/* render error screen if fetch fails */}
     {tweetDetailsError ?
     <ErrorScreen/>
   :

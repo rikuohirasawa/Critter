@@ -76,7 +76,7 @@ const reducer = (state, action) => {
 export const CurrentUserProvider = ({children}) => {
     const [state, dispatch] = useReducer(reducer, initialState)
 
-
+    // fetch profile info for user (static hard coded)
     useEffect(()=>{
         fetch('/api/me/profile')
           .then((res)=>res.json())
